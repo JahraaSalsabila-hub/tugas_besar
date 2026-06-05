@@ -5,11 +5,11 @@ import "fmt"
 const NMAX = 100
 
 type Resep struct {
-	nama      string
-	kategori  string
-	bahan     string
-	durasi    int
-	langkah   string
+	nama       string
+	kategori   string
+	bahan      string
+	durasi     int
+	langkah    string
 	jumlahCari int
 }
 
@@ -137,6 +137,7 @@ func hapusResep() {
 			n--
 
 			fmt.Println("Data berhasil dihapus")
+			break
 		}
 	}
 
@@ -219,6 +220,23 @@ func selectionSortDurasi() {
 	fmt.Println("Data berhasil diurutkan berdasarkan durasi")
 }
 
+func insertionSortBahan() {
+	var i, j int
+	var temp Resep
+
+	for i = 1; i < n; i++ {
+		temp = data[i]
+		j = i - 1
+
+		for j >= 0 && data[j].bahan > temp.bahan {
+			data[j+1] = data[j]
+			j--
+		}
+
+		data[j+1] = temp
+	}
+}
+
 func binarySearch() {
 	var cari string
 	var left, right, mid int
@@ -229,9 +247,9 @@ func binarySearch() {
 		return
 	}
 
-	insertionSortNama()
+	insertionSortBahan()
 
-	fmt.Print("Masukkan nama resep : ")
+	fmt.Print("Masukkan nama bahan : ")
 	fmt.Scan(&cari)
 
 	left = 0
@@ -241,7 +259,7 @@ func binarySearch() {
 	for left <= right {
 		mid = (left + right) / 2
 
-		if data[mid].nama == cari {
+		if data[mid].bahan == cari {
 			ketemu = true
 
 			data[mid].jumlahCari++
@@ -254,10 +272,32 @@ func binarySearch() {
 			fmt.Println("Langkah      :", data[mid].langkah)
 
 			break
-		} else if data[mid].nama < cari {
+		} else if data[mid].bahan < cari {
 			left = mid + 1
 		} else {
 			right = mid - 1
+		}
+	}
+	if ketemu {
+		start := mid
+		for start > 0 && data[start-1].bahan == cari {
+			start--
+		}
+		end := mid
+		for end < n-1 && data[end+1].bahan == cari {
+			end++
+		}
+		for i := start; i <= end; i++ {
+			if i == mid {
+				continue
+			}
+			data[i].jumlahCari++
+			fmt.Println("---------------------------")
+			fmt.Println("Nama Resep   :", data[i].nama)
+			fmt.Println("Kategori     :", data[i].kategori)
+			fmt.Println("Bahan Utama  :", data[i].bahan)
+			fmt.Println("Durasi       :", data[i].durasi, "menit")
+			fmt.Println("Langkah      :", data[i].langkah)
 		}
 	}
 
@@ -283,6 +323,32 @@ func statistik() {
 	for i = 1; i < n; i++ {
 		if data[i].jumlahCari > data[max].jumlahCari {
 			max = i
+		}
+	}
+	fmt.Println("\nJumlah Resep Per Kategori Bahan:")
+	var kategoriDihitung [NMAX]string
+	jumlahKategoriUnik := 0
+
+	for a := 0; a < n; a++ {
+		sudahAda := false
+		for b := 0; b < jumlahKategoriUnik; b++ {
+			if data[a].kategori == kategoriDihitung[b] {
+				sudahAda = true
+				break
+			}
+		}
+
+		if !sudahAda {
+			kategoriDihitung[jumlahKategoriUnik] = data[a].kategori
+			jumlahKategoriUnik++
+
+			hitung := 0
+			for c := 0; c < n; c++ {
+				if data[c].kategori == data[a].kategori {
+					hitung++
+				}
+			}
+			fmt.Printf("- Kategori %s: %d resep\n", data[a].kategori, hitung)
 		}
 	}
 
